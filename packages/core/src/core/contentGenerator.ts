@@ -38,12 +38,14 @@ export enum AuthType {
   LOGIN_WITH_GOOGLE_PERSONAL = 'oauth-personal',
   USE_GEMINI = 'gemini-api-key',
   USE_VERTEX_AI = 'vertex-ai',
+  USE_CUSTOM = 'custom-api',
 }
 
 export type ContentGeneratorConfig = {
   model: string;
   apiKey?: string;
   vertexai?: boolean;
+  baseUrl?: string;
   authType?: AuthType | undefined;
 };
 
@@ -56,6 +58,8 @@ export async function createContentGeneratorConfig(
   const googleApiKey = process.env.GOOGLE_API_KEY;
   const googleCloudProject = process.env.GOOGLE_CLOUD_PROJECT;
   const googleCloudLocation = process.env.GOOGLE_CLOUD_LOCATION;
+  const customApiKey = process.env.CUSTOM_API_KEY;
+  const customBaseUrl = process.env.CUSTOM_API_BASE_URL;
 
   // Use runtime model from config if available, otherwise fallback to parameter or default
   const effectiveModel = config?.getModel?.() || model || DEFAULT_GEMINI_MODEL;
@@ -97,6 +101,12 @@ export async function createContentGeneratorConfig(
     return contentGeneratorConfig;
   }
 
+  if (authType === AuthType.USE_CUSTOM && customApiKey && customBaseUrl) {
+    contentGeneratorConfig.apiKey = customApiKey;
+    contentGeneratorConfig.baseUrl = customBaseUrl;
+    return contentGeneratorConfig;
+  }
+
   return contentGeneratorConfig;
 }
 
@@ -108,14 +118,18 @@ export async function createContentGenerator(
     headers: {
       'User-Agent': `GeminiCLI/${version} (${process.platform}; ${process.arch})`,
     },
-  };
+  } as { headers: Record<string, string>; baseUrl?: string };
+  if (config.baseUrl) {
+    httpOptions.baseUrl = config.baseUrl;
+  }
   if (config.authType === AuthType.LOGIN_WITH_GOOGLE_PERSONAL) {
     return createCodeAssistContentGenerator(httpOptions, config.authType);
   }
 
   if (
     config.authType === AuthType.USE_GEMINI ||
-    config.authType === AuthType.USE_VERTEX_AI
+    config.authType === AuthType.USE_VERTEX_AI ||
+    config.authType === AuthType.USE_CUSTOM
   ) {
     const googleGenAI = new GoogleGenAI({
       apiKey: config.apiKey === '' ? undefined : config.apiKey,

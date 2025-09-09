@@ -90,3 +90,18 @@ The Gemini CLI requires you to authenticate with Google's AI services. On initia
           echo 'export GOOGLE_GENAI_USE_VERTEXAI=true' >> ~/.bashrc
           source ~/.bashrc
           ```
+
+5.  **Custom API:**
+    - Use this option to connect to a Gemini-compatible provider using your own API endpoint and key.
+    - Set the `CUSTOM_API_BASE_URL` and `CUSTOM_API_KEY` environment variables. Replace the placeholders with your provider's base URL and API key.
+      - Temporarily for the current shell session:
+        ```bash
+        export CUSTOM_API_BASE_URL="https://your-provider.example.com"
+        export CUSTOM_API_KEY="YOUR_CUSTOM_API_KEY"
+        ```
+      - For repeated use, add these variables to your `.env` file or shell configuration (like `~/.bashrc`, `~/.zshrc`, or `~/.profile`). For example:
+        ```bash
+        echo 'export CUSTOM_API_BASE_URL="https://your-provider.example.com"' >> ~/.bashrc
+        echo 'export CUSTOM_API_KEY="YOUR_CUSTOM_API_KEY"' >> ~/.bashrc
+        source ~/.bashrc
+        ```

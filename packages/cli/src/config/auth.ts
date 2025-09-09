@@ -35,5 +35,14 @@ export const validateAuthMethod = (authMethod: string): string | null => {
     return null;
   }
 
+  if (authMethod === AuthType.USE_CUSTOM) {
+    if (!process.env.CUSTOM_API_KEY || !process.env.CUSTOM_API_BASE_URL) {
+      return (
+        'CUSTOM_API_KEY and CUSTOM_API_BASE_URL environment variables not found. Add them to your .env and try again, no reload needed!'
+      );
+    }
+    return null;
+  }
+
   return 'Invalid auth method selected.';
 };

@@ -48,6 +48,14 @@ describe('parseAndFormatApiError', () => {
     expect(result).toContain(vertexMessage);
   });
 
+  it('should format a 429 API error with the default message for custom auth', () => {
+    const errorMessage =
+      'got status: 429 Too Many Requests. {"error":{"code":429,"message":"Rate limit exceeded","status":"RESOURCE_EXHAUSTED"}}';
+    const result = parseAndFormatApiError(errorMessage, AuthType.USE_CUSTOM);
+    expect(result).toContain('[API Error: Rate limit exceeded');
+    expect(result).toContain('Your request has been rate limited');
+  });
+
   it('should return the original message if it is not a JSON error', () => {
     const errorMessage = 'This is a plain old error message';
     expect(parseAndFormatApiError(errorMessage)).toBe(

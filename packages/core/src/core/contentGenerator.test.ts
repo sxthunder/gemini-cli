@@ -47,4 +47,28 @@ describe('contentGenerator', () => {
     });
     expect(generator).toBe((mockGenerator as GoogleGenAI).models);
   });
+
+  it('should create a GoogleGenAI content generator with custom base URL', async () => {
+    const mockGenerator = {
+      models: {},
+    } as unknown;
+    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
+    const generator = await createContentGenerator({
+      model: 'test-model',
+      apiKey: 'test-api-key',
+      baseUrl: 'https://example.com',
+      authType: AuthType.USE_CUSTOM,
+    });
+    expect(GoogleGenAI).toHaveBeenCalledWith({
+      apiKey: 'test-api-key',
+      vertexai: undefined,
+      httpOptions: {
+        headers: {
+          'User-Agent': expect.any(String),
+        },
+        baseUrl: 'https://example.com',
+      },
+    });
+    expect(generator).toBe((mockGenerator as GoogleGenAI).models);
+  });
 });
